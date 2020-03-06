@@ -2,6 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import time
 
 cap = cv2.VideoCapture("video1.mp4")
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -20,30 +21,45 @@ while True:
 
     ret, limiarizada = cv2.threshold(gray, 190, 255, cv2.THRESH_BINARY)
 
-    lines = cv2.HoughLines(limiarizada,1, np.pi/180, 50, np.array([]),0,0)
+    lines = cv2.HoughLines(limiarizada,1, np.pi/180, 200)
 
-    print(len(lines))
+    for line in lines:
+        for rho,theta in line:
+            a = np.cos(theta)
+            b = np.sin(theta)
+            print(a)
+#            time.sleep(0.5)
+            if a > 0.5 or a < -0.5:
+                x0 = a*rho
+                y0 = b*rho
+                x1 = int(x0 + 1000*(-b))
+                y1 = int(y0 + 1000*(a))
+                x2 = int(x0 - 1000*(-b))
+                y2 = int(y0 - 1000*(a))
+                cv2.line(video,(x1,y1),(x2,y2),(0,255,0),10)
+            else:
+                pass
 
-    a,b,c = lines.shape
-    for i in range(a):
-        rho1 = lines[0][0][0]
-        theta1 = lines[0][0][1]
-        rho2 = lines[1][0][0]
-        theta2 = lines[1][0][1]
+#    a,b,c = lines.shape
+#    for i in range(a):
+#        rho1 = lines[0][0][0]
+#        theta1 = lines[0][0][1]
+#        rho2 = lines[1][0][0]
+#        theta2 = lines[1][0][1]
         
-        a1 = math.cos(theta1)
-        b1 = math.sin(theta1)
-        x0, y0 = a1*rho1, b1*rho1
-        pt1 = ( int(x0+1000*(-b1)), int(y0+1000*(a1)) )
-        pt2 = ( int(x0-1000*(-b1)), int(y0-1000*(a1)) )
-        cv2.line(video, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
+#        a1 = math.cos(theta1)
+#        b1 = math.sin(theta1)
+#        x0, y0 = a1*rho1, b1*rho1
+#        pt1 = (int(x0+1000*(-b1)), int(y0+1000*(a1)))
+#        pt2 = (int(x0-1000*(-b1)), int(y0-1000*(a1)))
+#        cv2.line(video, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
 
-        a2 = math.cos(theta2)
-        b2 = math.sin(theta2)
-        x0_2, y0_2 = a2*rho2, b2*rho2
-        pt2_2 = ( int(x0_2+1000*(-b2)), int(y0_2+1000*(a2)) )
-        pt2_2 = ( int(x0_2-1000*(-b2)), int(y0_2-1000*(a2)) )
-        cv2.line(video, pt1_2, pt2_2, (0, 0, 255), 3, cv2.LINE_AA)
+#        a2 = math.cos(theta2)
+#        b2 = math.sin(theta2)
+#        x0_2, y0_2 = a2*rho2, b2*rho2
+#        pt2_1 = (int(x0_2+1000*(-b2)), int(y0_2+1000*(a2)))
+#        pt2_2 = (int(x0_2-1000*(-b2)), int(y0_2-1000*(a2)))
+#        cv2.line(video, pt2_1, pt2_2, (0, 0, 255), 3, cv2.LINE_AA)
 
 #    try:
 #        line1 = lines[0][0]    
