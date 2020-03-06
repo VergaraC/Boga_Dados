@@ -12,10 +12,10 @@ Para rodar os arquivo é necessário:
 
 -Libs para python:
 
-  -OpenCV2
-  
-  -math
-  
-  -matplotlib
-  
-  -várias
+          -OpenCV2
+
+          -math
+
+          -matplotlib
+
+          -várias
