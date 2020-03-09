@@ -4,7 +4,9 @@ import numpy as np
 import math
 import time
 
-cap = cv2.VideoCapture("video1.mp4")
+#cap = cv2.VideoCapture("video1.mp4")
+#cap = cv2.VideoCapture("video2.mp4")
+cap = cv2.VideoCapture("video3.mp4")
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
@@ -19,7 +21,7 @@ while True:
 
 #    video_eq = cv2.equalizeHist(gray)
 
-    ret, limiarizada = cv2.threshold(gray, 210, 255, cv2.THRESH_BINARY)
+    ret, limiarizada = cv2.threshold(gray, 215, 255, cv2.THRESH_BINARY)
 
     lines = cv2.HoughLines(limiarizada,1, np.pi/180, 200)
 
@@ -30,6 +32,8 @@ while True:
             
 #            time.sleep(0.5)
 
+# ====================================================================
+# if para o video 1:
             if 0.7 > m > 0.6 or -0.7 > m > -0.8:
                 if m < 0:
                     print(m)
@@ -42,6 +46,36 @@ while True:
                 cv2.line(video,(x1,y1),(x2,y2),(0,255,0),10)
             else:
                 pass
+
+# ====================================================================
+# if para o video 2:
+            #if 0.7 > m > 0.6 or -0.7 > m > -0.8:
+            #    if m < 0:
+            #        print(m)
+            #    x0 = m*rho
+            #    y0 = b*rho
+            #    x1 = int(x0 + 1000*(-b))
+            #    y1 = int(y0 + 1000*(m))
+            #    x2 = int(x0 - 1000*(-b))
+            #    y2 = int(y0 - 1000*(m))
+            #    cv2.line(video,(x1,y1),(x2,y2),(0,255,0),10)
+            #else:
+            #    pass
+
+# ====================================================================
+# if para o video 3:
+            #if 0.7 > m > 0.6 or -0.7 > m > -0.8:
+            #    if m < 0:
+            #        print(m)
+            #    x0 = m*rho
+            #    y0 = b*rho
+            #    x1 = int(x0 + 1000*(-b))
+            #    y1 = int(y0 + 1000*(m))
+            #    x2 = int(x0 - 1000*(-b))
+            #    y2 = int(y0 - 1000*(m))
+            #    cv2.line(video,(x1,y1),(x2,y2),(0,255,0),10)
+            #else:
+            #    pass
 
     #lower_white = np.array([0, 0, 150])
     #higher_white = np.array([255, 30, 255])
