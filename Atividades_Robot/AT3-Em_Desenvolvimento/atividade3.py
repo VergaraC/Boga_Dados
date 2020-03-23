@@ -15,6 +15,10 @@ coef_angular_positivo = []
 coef_angular_negativo = []
 coef_linear_positivo = []
 coef_linear_negativo = []
+
+lista_xi = []
+lista_yi = []
+
 while True:
     ret, video = cap.read()
 
@@ -39,7 +43,7 @@ while True:
 
 #====================================================================
     #threshold para o video 3:
-    ret, limiarizada = cv2.threshold(gray,230,255,cv2.THRESH_BINARY)
+    ret, limiarizada = cv2.threshold(gray,230,255,cv2.THRESH_BINARY)    
 #====================================================================
     lines = cv2.HoughLines(limiarizada,1, np.pi/180, 200)
 
@@ -80,15 +84,34 @@ while True:
                     h2 = coef_linear_negativo[len(coef_linear_negativo)-1]
                     m2 = coef_angular_negativo[len(coef_angular_negativo)-1]
                     
-                    if np.isnan((h2-h1)/(m1-m2)):
-                        pass
-#                    
-                    else:
-                        xi = ((x1*y2 - y1*x2)*(x3 - x4) - (x1-x2)*(x3*y4 - y3*x4))/((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4))#((h2-h1)/(m1-m2))
-                        yi = ((x1*y2 - y1*x2)*(y3 - y4) - (y1-y2)*(x3*y4 - y3*x4))/((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4))#(m1*xi) + h1
-                        print(xi)
-                        print(yi)
-                        ponto_fuga = cv2.circle(video, (xi,yi), 3, (0,0,255), 5)
+                    xi = ((x1*y2 - y1*x2)*(x3 - x4) - (x1-x2)*(x3*y4 - y3*x4))/((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4))#((h2-h1)/(m1-m2))
+                    yi = ((x1*y2 - y1*x2)*(y3 - y4) - (y1-y2)*(x3*y4 - y3*x4))/((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4))#(m1*xi) + h1
+
+                    lista_xi.append(xi)
+                    lista_yi.append(yi)
+
+#                    termo_xi = int(np.round(len(lista_xi)/2))
+#                    termo_yi = int(np.round(len(lista_yi)/2))
+
+#                    print(termo_yi)
+#                    print(termo_xi)
+                    
+#                    print(termo_xi)
+#                    print(termo_yi)
+#                    for i in lista_xi:
+#                        print(lista_xi[int(np.mean(len(lista_xi)))])
+#                    print(lista_xi[termo_xi])
+#                    print(lista_yi[termo_yi])
+
+#                    xi = lista_xi[termo_xi]
+#                    yi = lista_yi[termo_yi]
+#                    print(lista_xi[termo_xi])
+#                    print(lista_yi[termo_yi])
+
+#                    print(xi)
+#                    print(yi)
+
+                    ponto_fuga = cv2.circle(video, (xi,yi), 3, (0,0,255), 5)
 #
                 except:
                     pass
