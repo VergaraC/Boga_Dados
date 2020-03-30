@@ -1,0 +1,17 @@
+{
+    "aluno-1": {
+      "nome": "Victor Vergara",
+      "email-insper": "victorvaac@al.insper.edu.br",
+      "user-github": "Vergara_C"
+    },
+    "aluno-2": {
+      "nome": "Antonio Fuziy",
+      "email-insper": "antoniovf@al.insper.edu.br",
+      "user-github": "AntonioFuziy"
+    },
+    "aluno-3": {
+        "nome": "André Rocco",
+        "email-insper": "andrebr@al.insper.edu.br",
+        "user-github": "decorocco"
+    }
+}
