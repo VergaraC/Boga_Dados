@@ -1,0 +1,1 @@
+Necessário utilizar baixar e utilizar o YOLOv3, copiar do GitHub robot20
