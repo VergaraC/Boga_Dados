@@ -15,6 +15,8 @@ from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
 import cormodule
+from sensor_msgs.msg import LaserScan
+import le_scan
 
 
 bridge = CvBridge()
@@ -26,13 +28,16 @@ atraso = 1.5E9 # 1 segundo e meio. Em nanossegundos
 
 area = 0.0 # Variavel com a area do maior contorno
 
+v = 0.1
+w = 0.1
+
 # Só usar se os relógios ROS da Raspberry e do Linux desktop estiverem sincronizados. 
 # Descarta imagens que chegam atrasadas demais
 check_delay = False 
 
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
-	print("frame")
+	#print("frame")
 	global cv_image
 	global media
 	global centro
@@ -41,9 +46,9 @@ def roda_todo_frame(imagem):
 	imgtime = imagem.header.stamp
 	lag = now-imgtime # calcula o lag
 	delay = lag.nsecs
-	print("delay ", "{:.3f}".format(delay/1.0E9))
+	#print("delay ", "{:.3f}".format(delay/1.0E9))
 	if delay > atraso and check_delay==True:
-		print("Descartando por causa do delay do frame:", delay)
+		#print("Descartando por causa do delay do frame:", delay)
 		return 
 	try:
 		antes = time.clock()
@@ -81,7 +86,12 @@ if __name__=="__main__":
 	# 
 
 	recebedor = rospy.Subscriber(topico_imagem, CompressedImage, roda_todo_frame, queue_size=4, buff_size = 2**24)
-	print("Usando ", topico_imagem)
+	#print("Usando ", topico_imagem)
+	
+	#miranda
+	recebe_scan = rospy.Subscriber("/scan", LaserScan, le_scan.scaneou)
+
+
 
 	velocidade_saida = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
 
@@ -89,14 +99,25 @@ if __name__=="__main__":
 
 		while not rospy.is_shutdown():
 			vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-			if len(media) != 0 and len(centro) != 0:
-				print("Média dos vermelhos: {0}, {1}".format(media[0], media[1]))
-				print("Centro dos vermelhos: {0}, {1}".format(centro[0], centro[1]))
 
-				if (media[0] > centro[0]):
-					vel = Twist(Vector3(0,0,0), Vector3(0,0,-0.1))
-				if (media[0] < centro[0]):
-					vel = Twist(Vector3(0,0,0), Vector3(0,0,0.1))
+			if len(media) != 0 and len(centro) != 0:\
+				
+				#print("Média dos vermelhos: {0}, {1}".format(media[0], media[1]))
+				#print("Centro dos vermelhos: {0}, {1}".format(centro[0], centro[1]))
+
+				print(le_scan.leitura_scan) # miranda
+				vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+
+				if le_scan.leitura_scan <= 1 and le_scan.leitura_scan != 0:
+					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+
+				if le_scan.leitura_scan > 1:
+
+					if (media[0] > centro[0]):
+						vel = Twist(Vector3(v,0,0), Vector3(0,0,-w))
+
+					if (media[0] < centro[0]):
+						vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
 			velocidade_saida.publish(vel)
 			rospy.sleep(0.1)
 
