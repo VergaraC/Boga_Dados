@@ -91,7 +91,7 @@ if __name__=="__main__":
 	#miranda
 	recebe_scan = rospy.Subscriber("/scan", LaserScan, le_scan.scaneou)
 
-
+		# cv_image = cv2.flip(cv_image, -1)
 
 	velocidade_saida = rospy.Publisher("/cmd_vel", Twist, queue_size = 1)
 
@@ -100,19 +100,17 @@ if __name__=="__main__":
 		while not rospy.is_shutdown():
 			vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
-			if len(media) != 0 and len(centro) != 0:\
+			if len(media) != 0 and len(centro) != 0:
 				
 				#print("Média dos vermelhos: {0}, {1}".format(media[0], media[1]))
 				#print("Centro dos vermelhos: {0}, {1}".format(centro[0], centro[1]))
 
 				print(le_scan.leitura_scan) # miranda
-				vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
-
 				if le_scan.leitura_scan <= 1 and le_scan.leitura_scan != 0:
+					print('Para KRL')
 					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-
+				print('N para')
 				if le_scan.leitura_scan > 1:
-
 					if (media[0] > centro[0]):
 						vel = Twist(Vector3(v,0,0), Vector3(0,0,-w))
 
@@ -123,3 +121,4 @@ if __name__=="__main__":
 
 	except rospy.ROSInterruptException:
 	    print("Ocorreu uma exceção com o rospy")
+ 
