@@ -30,6 +30,7 @@ area = 0.0 # Variavel com a area do maior contorno
 
 v = 0.1
 w = 0.1
+d=0.4 #Distancia do Creeper quando parar
 
 # Só usar se os relógios ROS da Raspberry e do Linux desktop estiverem sincronizados. 
 # Descarta imagens que chegam atrasadas demais
@@ -106,11 +107,11 @@ if __name__=="__main__":
 				#print("Centro dos vermelhos: {0}, {1}".format(centro[0], centro[1]))
 
 				print(le_scan.leitura_scan) # miranda
-				if le_scan.leitura_scan <= 1 and le_scan.leitura_scan != 0:
+				if le_scan.leitura_scan <= d and le_scan.leitura_scan != 0:
 					print('Para KRL')
 					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
-				print('N para')
-				if le_scan.leitura_scan > 1:
+				
+				if le_scan.leitura_scan > d:
 					if (media[0] > centro[0]):
 						vel = Twist(Vector3(v,0,0), Vector3(0,0,-w))
 
