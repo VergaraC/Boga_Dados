@@ -31,7 +31,8 @@ def identifica_cor(frame):
     #Roxo: 300,99,100
     #Verde: 124,100,100
     #Azul:207,96,99
-############# Roxo 3###############
+    
+############# Roxo ################
     '''
     cor_menor = np.array([135, 90, 90])
     cor_maior = np.array([165, 255, 255])
@@ -48,6 +49,7 @@ def identifica_cor(frame):
     cor_menor = np.array([89, 90, 90])
     cor_maior = np.array([119, 255, 255])
     segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
+
 
     '''cor_menor = np.array([295, 90, 90])
     cor_maior = np.array([320, 110, 110])
