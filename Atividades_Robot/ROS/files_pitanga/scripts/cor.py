@@ -28,8 +28,8 @@ atraso = 1.5E9 # 1 segundo e meio. Em nanossegundos
 
 area = 0.0 # Variavel com a area do maior contorno
 
-v = 0.1
-w = 0.1
+v = 0.2
+w = 0.3
 d=0.4 #Distancia do Creeper quando parar
 
 # Só usar se os relógios ROS da Raspberry e do Linux desktop estiverem sincronizados. 
@@ -112,11 +112,18 @@ if __name__=="__main__":
 					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 				
 				if le_scan.leitura_scan > d:
+					dif_media = media[0] - media[1]
+
 					if (media[0] > centro[0]):
-						vel = Twist(Vector3(v,0,0), Vector3(0,0,-w))
+						vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
 
 					if (media[0] < centro[0]):
-						vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
+						vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+					
+					if (120 > dif_media > 80 or 230 < dif_media < 140 or -120 < dif_media < -40):
+						vel = Twist(Vector3(v,0,0), Vector3(v,0,0))
+
+				print(media)
 			velocidade_saida.publish(vel)
 			rospy.sleep(0.1)
 
