@@ -28,8 +28,6 @@ while True:
 
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
 
-#    video_eq = cv2.equalizeHist(gray)
-
 #====================================================================
     #threshold para o video 1:
     #ret, limiarizada = cv2.threshold(gray, 215, 255, cv2.THRESH_BINARY)
@@ -77,6 +75,7 @@ while True:
                 x4 = int(x0 - 1000*(-b))
                 y4 = int(y0 - 1000*(m))
                 line = cv2.line(video,(x3,y3),(x4,y4),(0,255,0),3)
+                
                 try:
                     h1 = coef_linear_positivo[len(coef_linear_positivo)-1]
                     m1 = coef_angular_positivo[len(coef_angular_positivo)-1]

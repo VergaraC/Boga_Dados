@@ -108,7 +108,6 @@ if __name__=="__main__":
 
 				print(le_scan.leitura_scan) # miranda
 				if le_scan.leitura_scan <= d and le_scan.leitura_scan != 0:
-					print('Para KRL')
 					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 				
 				if le_scan.leitura_scan > d:
@@ -121,7 +120,7 @@ if __name__=="__main__":
 						vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 					
 					if (120 > dif_media > 80 or 230 < dif_media < 140 or -120 < dif_media < -40):
-						vel = Twist(Vector3(v,0,0), Vector3(v,0,0))
+						vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
 
 				print(media)
 			velocidade_saida.publish(vel)
