@@ -16,11 +16,20 @@ coef_angular_negativo = []
 coef_linear_positivo = []
 coef_linear_negativo = []
 
-lista_xi = []
-lista_yi = []
+mediana_x = 0
+mediana_y = 0
 
 while True:
     ret, video = cap.read()
+
+    lista_xi = []
+    lista_yi = []
+
+    x_ponto_fuga = []
+    y_ponto_fuga = []
+
+    avg_x=0
+    avg_y=0
 
     rgb = cv2.cvtColor(video, cv2.COLOR_BGR2RGB)
     gray = cv2.cvtColor(video, cv2.COLOR_BGR2GRAY)
@@ -30,7 +39,7 @@ while True:
 
 #====================================================================
     #threshold para o video 1:
-    #ret, limiarizada = cv2.threshold(gray, 215, 255, cv2.THRESH_BINARY)
+    ret, limiarizada = cv2.threshold(gray, 230, 255, cv2.THRESH_BINARY)
 
 #====================================================================
 
@@ -41,7 +50,7 @@ while True:
 
 #====================================================================
     #threshold para o video 3:
-    ret, limiarizada = cv2.threshold(gray,230,255,cv2.THRESH_BINARY)    
+    #ret, limiarizada = cv2.threshold(gray,230,255,cv2.THRESH_BINARY)    
 #====================================================================
     lines = cv2.HoughLines(limiarizada,1, np.pi/180, 200)
 
@@ -54,7 +63,7 @@ while True:
 
 #====================================================================
 # if para o video 1:
-            if 0.7 > m > 0.6: #or -0.7 > m > -0.8:
+            if 0.7 > m > 0.6:
                 coef_angular_positivo.append(m)
                 coef_linear_positivo.append(b)
                 x0 = m*rho
@@ -89,6 +98,33 @@ while True:
                     lista_xi.append(xi)
                     lista_yi.append(yi)
 
+                    x_ponto_fuga.append(xi)
+                    y_ponto_fuga.append(yi)
+
+                    cv2.circle(video, (xi,yi), 3, (0,0,255), 3)
+                    
+                except:
+                    pass
+            else:
+                pass
+
+
+    try:
+        avg_x = int(np.mean(x_ponto_fuga))
+        avg_y = int(np.mean(y_ponto_fuga))
+        cv2.circle(video, (avg_x,avg_y), 3, (255,0,0), 5)
+    except:
+        pass
+    cv2.imshow('video', video)
+#    cv2.imshow('mask', mask)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+
+
 #                    termo_xi = int(np.round(len(lista_xi)/2))
 #                    termo_yi = int(np.round(len(lista_yi)/2))
 
@@ -109,13 +145,6 @@ while True:
 
 #                    print(xi)
 #                    print(yi)
-
-                    ponto_fuga = cv2.circle(video, (xi,yi), 3, (0,0,255), 5)
-#
-                except:
-                    pass
-            else:
-                pass
 
 #====================================================================
 # if para o video 2:
@@ -153,11 +182,3 @@ while True:
 
 #    mask = cv2.inRange(hsv, lower_white, higher_white)
     #cv2.imshow('threshold', video)
-    cv2.imshow('video', video)
-#    cv2.imshow('mask', mask)
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
