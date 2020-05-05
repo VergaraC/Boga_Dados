@@ -56,28 +56,36 @@ check_delay = False
 
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
-	print("frame")
-	global cv_image
-	global media
-	global centro
+    print("frame")
+    global cv_image
+    global media
+    global centro
+    global resultados
 
-	now = rospy.get_rostime()
-	imgtime = imagem.header.stamp
-	lag = now-imgtime # calcula o lag
-	delay = lag.nsecs
-	print("delay ", "{:.3f}".format(delay/1.0E9))
-	if delay > atraso and check_delay==True:
-		print("Descartando por causa do delay do frame:", delay)
-		return 
-	try:
-		antes = time.clock()
-		cv_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
-		media, centro, maior_area =  cormodule.identifica_cor(cv_image)
-		depois = time.clock()
-#		cv2.imshow("Camera", cv_image)
-	except CvBridgeError as e:
-		print('ex', e)
+    now = rospy.get_rostime()
+    imgtime = imagem.header.stamp
+    lag = now-imgtime # calcula o lag
+    delay = lag.nsecs
+    # print("delay ", "{:.3f}".format(delay/1.0E9))
+    if delay > atraso and check_delay==True:
+        print("Descartando por causa do delay do frame:", delay)
+        return 
+    try:
+        antes = time.clock()
+        temp_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
+        # Note que os resultados já são guardados automaticamente na variável
+        # chamada resultados
+        centro, saida_net, resultados =  visao_module.processa(temp_image)        
+        for r in resultados:
+            # print(r) - print feito para documentar e entender
+            # o resultado            
+            pass
 
+        depois = time.clock()
+        # Desnecessário - Hough e MobileNet já abrem janelas
+        cv_image = saida_net.copy()
+    except CvBridgeError as e:
+        print('ex', e)
 #========================= le_scan =========================
 
 def scaneou(dado):
@@ -172,7 +180,7 @@ if __name__=="__main__":
 			if cv_image is not None:
 				ponto_fuga = atividade3_projeto.ponto_fuga(cv_image)
 
-				if len(centro) != 0:
+				if len(centro) and len(media)!= 0:
 					#print(leitura_scan)
 
 					#Codigo para identificar o creeper pela cor
@@ -201,7 +209,7 @@ if __name__=="__main__":
 						#if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
 						#	vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
 				else:
-					vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
 				velocidade_saida.publish(vel)
 

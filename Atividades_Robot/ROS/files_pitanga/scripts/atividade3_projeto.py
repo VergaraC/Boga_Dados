@@ -37,7 +37,7 @@ def ponto_fuga(frame):
             m = np.cos(theta)
             b = np.sin(theta)
             
-            if 0.7 > m > 0.6:
+            if m > 0.2:
                 coef_angular_positivo.append(m)
                 coef_linear_positivo.append(b)
                 x0 = m*rho
@@ -48,7 +48,7 @@ def ponto_fuga(frame):
                 y2 = int(y0 - 1000*(m))
                 line = cv2.line(frame,(x1,y1),(x2,y2),(0,255,0),3)
             
-            elif -0.7 > m > -0.8:
+            elif m < -0.2:
                 coef_angular_negativo.append(m)
                 coef_linear_negativo.append(b)
                 x0 = m*rho
@@ -91,4 +91,4 @@ def ponto_fuga(frame):
     except:
         pass
 
-    return (x_ponto_fuga,y_ponto_fuga)
+    return (avg_x,avg_y)
