@@ -16,10 +16,15 @@ import smach
 import smach_ros
 
 
+### Genérica de debug OpenCV
+cor_debug = None
+
 def identifica_cor(frame):
     '''
     Segmenta o maior objeto cuja cor é parecida com cor_h (HUE da cor, no espaço HSV).
     '''
+
+    global cor_debug
 
     # No OpenCV, o canal H vai de 0 até 179, logo cores similares ao 
     # vermelho puro (H=0) estão entre H=-8 e H=8. 
@@ -49,6 +54,7 @@ def identifica_cor(frame):
     cor_menor = np.array([89, 90, 90])
     cor_maior = np.array([119, 255, 255])
     segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
+
 
 
     '''cor_menor = np.array([295, 90, 90])
@@ -103,6 +109,7 @@ def identifica_cor(frame):
 
    # cv2.imshow('video', frame)
     #cv2.imshow('seg', segmentado_cor)
+    # cor_debug = frame.copy()
     #cv2.waitKey(1)
 
     return media, centro, maior_contorno_area
