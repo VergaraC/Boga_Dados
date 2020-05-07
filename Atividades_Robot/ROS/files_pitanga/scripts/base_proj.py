@@ -134,7 +134,7 @@ def recebe(msg):
 
 faixa_creeper = 5
 
-faixa_ponto_fuga = 3
+faixa_ponto_fuga = 20
 
 d = 0.4
 
@@ -146,6 +146,8 @@ coef_linear_negativo = []
 
 mediana_x = 0
 mediana_y = 0
+
+id_creeper = 0
 
 if __name__=="__main__":
 
@@ -179,36 +181,59 @@ if __name__=="__main__":
 		while not rospy.is_shutdown():
 			if cv_image is not None:
 				ponto_fuga = atividade3_projeto.ponto_fuga(cv_image)
+				print(ponto_fuga)
 
-				if len(centro) and len(media)!= 0:
+				if len(centro) != 0:
 					#print(leitura_scan)
 
 					#Codigo para identificar o creeper pela cor
 
-					if leitura_scan <= d and leitura_scan != 0:
-						vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+					#if leitura_scan <= d and leitura_scan != 0:
+						#vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 					
-					if leitura_scan > d:
-						if media[0] + faixa_creeper < centro[0]:
-							vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+					#if leitura_scan > d:
+						#if media[0] + faixa_creeper < centro[0]:
+							#vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
-						elif media[0] - faixa_creeper > centro[0]:
-							vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+						#elif media[0] - faixa_creeper > centro[0]:
+							#vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
 
-						if abs(media[0] - centro[0]) <= faixa_creeper:
-							vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+						#if abs(media[0] - centro[0]) <= faixa_creeper:
+							#vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
 
 						#Codigo com o robo na pista
 						
-						#if ponto_fuga[0] + faixa_ponto_fuga < centro[0]:
-						#	vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+						if ponto_fuga[0] + faixa_ponto_fuga < centro[0]:
+							print('direita')
+							vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
-						#elif ponto_fuga[0] - faixa_ponto_fuga > centro[0]:
-						#	vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+						elif ponto_fuga[0] - faixa_ponto_fuga > centro[0]:
+							print('esquerda')
+							vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
 						
-						#if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
-						#	vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+						if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
+							print('reto')
+							vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+
+						#if id == id_creeper and leitura_scan > d:
+						#	print('achei o id do creeper')
+						#	if media[0] + faixa_creeper < centro[0]:
+						#		print('centralizando no creeper')
+						#		vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+
+						#	elif media[0] - faixa_creeper > centro[0]:
+						#		print('centralizando no creeper')
+						#		vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+
+						#	if abs(media[0] - centro[0]) <= faixa_creeper:
+						#		print('andando em direção ao creeper')
+						#		vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+
+						#if leitura_scan <= d and leitura_scan != 0:
+						#	vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+
 				else:
+					print('parado')
 					vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
 
 				velocidade_saida.publish(vel)

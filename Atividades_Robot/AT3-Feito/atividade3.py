@@ -100,8 +100,6 @@ while True:
 
                     x_ponto_fuga.append(xi)
                     y_ponto_fuga.append(yi)
-
-                    cv2.circle(video, (xi,yi), 3, (0,0,255), 3)
                     
                 except:
                     pass
