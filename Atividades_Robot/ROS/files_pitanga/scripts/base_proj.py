@@ -31,8 +31,6 @@ id = 0
 
 leitura_scan = 0
 
-status_creeper=False
-
 w = 0.08
 v = 0.3
 
@@ -149,6 +147,7 @@ faixa_ponto_fuga = 20
 
 d = 0.4
 
+status_creeper=False
 
 coef_angular_positivo = []
 coef_angular_negativo = []
@@ -201,7 +200,7 @@ def parar():
     vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
     return vel
 
-def procurar_pista(v,w)
+def procurar_pista(v,w):
     v = 0.2
     vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
     return vel
@@ -249,7 +248,7 @@ if __name__=="__main__":
                     print('leitura scan')
                     print(leitura_scan)
                     
-                    if area >= 1000 and not status_creeper:
+                    if area >= 1000 and status_creeper ==False:
                         vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
 
                     else:
@@ -260,7 +259,10 @@ if __name__=="__main__":
                         status_creeper = True
                         print('press enter to continue')
                         #raw_input()
-
+                    if status_creeper==True:
+                        vel = procurar_pista(v,w)
+                        vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
+                    
                 else:
                     print('parado')
                     vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
