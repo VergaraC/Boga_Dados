@@ -31,8 +31,8 @@ id = 0
 
 leitura_scan = 0
 
-w = 0.1
-v = 0.3
+w = 0.08
+v = 0.1
 
 frame = "camera_link"
 # frame = "head_camera"  # DESCOMENTE para usar com webcam USB via roslaunch tag_tracking usbcam
@@ -57,21 +57,22 @@ check_delay = False
 
 # A função a seguir é chamada sempre que chega um novo frame
 def roda_todo_frame(imagem):
-    print("frame")
+    #print("frame")
     global cv_image
     global media
     global centro
     global resultados
     global img_cor
+    global area
 
     now = rospy.get_rostime()
     imgtime = imagem.header.stamp
     lag = now-imgtime # calcula o lag
     delay = lag.nsecs
     # print("delay ", "{:.3f}".format(delay/1.0E9))
-    if delay > atraso and check_delay==True:
-        print("Descartando por causa do delay do frame:", delay)
-        return 
+    #if delay > atraso and check_delay==True:
+    #    print("Descartando por causa do delay do frame:", delay)
+    #    return 
     try:
         antes = time.clock()
         temp_image = bridge.compressed_imgmsg_to_cv2(imagem, "bgr8")
@@ -86,7 +87,7 @@ def roda_todo_frame(imagem):
 
         # Parte cor:
 
-        media, centro, img_cor = visao_module.identifica_cor(temp_image) 
+        media, centro, img_cor, area = visao_module.identifica_cor(temp_image) 
         
 
         depois = time.clock()
@@ -109,7 +110,7 @@ def recebe(msg):
         id = marker.id
         marcador = "ar_marker_" + str(id)
 
-        print(tf_buffer.can_transform(frame, marcador, rospy.Time(0)))
+        #print(tf_buffer.can_transform(frame, marcador, rospy.Time(0)))
         header = Header(frame_id=marcador)
         # Procura a transformacao em sistema de coordenadas entre a base do robo e o marcador numero 100
         # Note que para seu projeto 1 voce nao vai precisar de nada que tem abaixo, a 
@@ -140,7 +141,7 @@ def recebe(msg):
 
 #====================== tratamento de eventos ============================
 
-faixa_creeper = 5
+faixa_creeper = 20
 
 faixa_ponto_fuga = 20
 
@@ -157,9 +158,35 @@ mediana_y = 0
 
 id_creeper = 0
 
+def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w, vel):
+    if ponto_fuga + faixa_ponto_fuga < centro_robo:
+        print('direita')
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+
+    elif ponto_fuga - faixa_ponto_fuga > centro_robo:
+        print('esquerda')
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+    
+    if abs(ponto_fuga - centro_robo) <= faixa_ponto_fuga:
+        print('reto')
+        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+
+def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w, vel):
+    if centro_creeper + faixa_creeper < centro_robo:
+        print('procurando')
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+
+    elif centro_creeper - faixa_creeper > centro_robo:
+        print('procurando')
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+
+    if abs(centro_creeper - centro_robo) <= faixa_creeper:
+        print('achei')
+        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+
 if __name__=="__main__":
 
-    print("Coordenadas configuradas para usar robô virtual, para usar webcam USB altere no código fonte a variável frame")
+    #print("Coordenadas configuradas para usar robô virtual, para usar webcam USB altere no código fonte a variável frame")
 
     rospy.init_node("marcador") # Como nosso programa declara  seu nome para o sistema ROS
 
@@ -204,31 +231,13 @@ if __name__=="__main__":
                      #   vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
                     
                     #if leitura_scan > d:
-                    if media[0] + faixa_creeper < centro[0]:
-                        print('procurando')
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
-
-                    elif media[0] - faixa_creeper > centro[0]:
-                        print('procurando')
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
-
-                    if abs(media[0] - centro[0]) <= faixa_creeper:
-                        print('achei')
-                        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
-
-                        #Codigo com o robo na pista
-                        
-                    #if ponto_fuga[0] + faixa_ponto_fuga < centro[0]:
-                    #    print('direita')
-                    #    vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
-
-                    #elif ponto_fuga[0] - faixa_ponto_fuga > centro[0]:
-                    #    print('esquerda')
-                    #    vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
                     
-                    #if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
-                    #    print('reto')
-                    #    vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+                    if area >= 3000:
+                        procurando_creeper(media[0], centro[0], faixa_creeper, v, w, vel)
+
+                    else:
+                        anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w, vel)
+                        
 
                         #if area >= 100 and leitura_scan > d:
                         #	print('achei o id do creeper')
