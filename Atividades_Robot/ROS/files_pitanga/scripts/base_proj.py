@@ -31,8 +31,10 @@ id = 0
 
 leitura_scan = 0
 
+status_creeper=False
+
 w = 0.08
-v = 0.2
+v = 0.3
 
 frame = "camera_link"
 # frame = "head_camera"  # DESCOMENTE para usar com webcam USB via roslaunch tag_tracking usbcam
@@ -190,9 +192,22 @@ def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w):
 
     if abs(centro_creeper - centro_robo) <= faixa_creeper:
         print('achei')
+        rospy.sleep(1)
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
     
     return vel
+
+def parar():
+    vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+    return vel
+
+def procurar_pista(v,w)
+    v = 0.2
+    vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
+    return vel
+
+#main ==================================================================
+
 
 if __name__=="__main__":
 
@@ -227,19 +242,24 @@ if __name__=="__main__":
             if cv_image is not None:
                 try:
                     ponto_fuga = atividade3_projeto.ponto_fuga(cv_image)
-                    #print(ponto_fuga)
                 except:
                     pass
 
                 if len(centro) and len(media) != 0:
-                    print('area')
-                    print(area)
+                    print('leitura scan')
+                    print(leitura_scan)
                     
-                    if area >= 1000:
+                    if area >= 1000 and not status_creeper:
                         vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
 
                     else:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
+                    
+                    if leitura_scan <= d:
+                        vel = parar()
+                        status_creeper = True
+                        print('press enter to continue')
+                        #raw_input()
 
                 else:
                     print('parado')
