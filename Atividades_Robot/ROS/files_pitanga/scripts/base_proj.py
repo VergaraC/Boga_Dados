@@ -81,12 +81,12 @@ def roda_todo_frame(imagem):
         centro, saida_net, resultados =  visao_module.processa(temp_image)        
         for r in resultados:
             # print(r) - print feito para documentar e entender
-            # o resultado            
+            # o resultado
             pass
 
         # Parte cor:
 
-        centro_cor, img_cor = visao_module.identifica_cor(temp_image) 
+        media, centro, img_cor = visao_module.identifica_cor(temp_image) 
         
 
         depois = time.clock()
@@ -190,43 +190,47 @@ if __name__=="__main__":
             if cv_image is not None:
                 try:
                     ponto_fuga = atividade3_projeto.ponto_fuga(cv_image)
-                    print(ponto_fuga)
+                    #print(ponto_fuga)
                 except:
                     pass
 
-                if len(centro) != 0:
-                    #print(leitura_scan)
+                if len(centro) and len(media) != 0:
+                    print('leitura_scan')
+                    print(leitura_scan)
 
                     #Codigo para identificar o creeper pela cor
 
                     #if leitura_scan <= d and leitura_scan != 0:
-                        #vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                     #   vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
                     
                     #if leitura_scan > d:
-                        #if media[0] + faixa_creeper < centro[0]:
-                            #vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+                    if media[0] + faixa_creeper < centro[0]:
+                        print('procurando')
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
-                        #elif media[0] - faixa_creeper > centro[0]:
-                            #vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+                    elif media[0] - faixa_creeper > centro[0]:
+                        print('procurando')
+                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
 
-                        #if abs(media[0] - centro[0]) <= faixa_creeper:
-                            #vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+                    if abs(media[0] - centro[0]) <= faixa_creeper:
+                        print('achei')
+                        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
 
                         #Codigo com o robo na pista
                         
-                    if ponto_fuga[0] + faixa_ponto_fuga < centro[0]:
-                        print('direita')
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+                    #if ponto_fuga[0] + faixa_ponto_fuga < centro[0]:
+                    #    print('direita')
+                    #    vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
-                    elif ponto_fuga[0] - faixa_ponto_fuga > centro[0]:
-                        print('esquerda')
-                        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+                    #elif ponto_fuga[0] - faixa_ponto_fuga > centro[0]:
+                    #    print('esquerda')
+                    #    vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
                     
-                    if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
-                        print('reto')
-                        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+                    #if abs(ponto_fuga[0] - centro[0]) <= faixa_ponto_fuga:
+                    #    print('reto')
+                    #    vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
 
-                        #if id == id_creeper and leitura_scan > d:
+                        #if area >= 100 and leitura_scan > d:
                         #	print('achei o id do creeper')
                         #	if media[0] + faixa_creeper < centro[0]:
                         #		print('centralizando no creeper')
