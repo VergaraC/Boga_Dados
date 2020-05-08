@@ -107,6 +107,7 @@ def identifica_cor(frame):
         cross(frame, centro, [255,0,0], 1, 17)
     else:
         media = (0, 0)
+        area = 0.0
 
     # Representa a area e o centro do maior contorno no frame
     font = cv2.FONT_HERSHEY_COMPLEX_SMALL

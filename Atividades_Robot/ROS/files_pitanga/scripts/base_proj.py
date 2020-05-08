@@ -145,7 +145,7 @@ faixa_creeper = 20
 
 faixa_ponto_fuga = 20
 
-d = 0.4
+d = 0.22
 
 status_creeper=False
 
@@ -191,7 +191,6 @@ def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w):
 
     if abs(centro_creeper - centro_robo) <= faixa_creeper:
         print('achei')
-        rospy.sleep(1)
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
     
     return vel
@@ -201,8 +200,13 @@ def parar():
     return vel
 
 def procurar_pista(v,w):
-    v = 0.2
-    vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
+    w = 0.1
+    vel = Twist(Vector3(0.1,0,0), Vector3(0,0,-w))
+    return vel
+
+def dar_re(v):
+    v = -0.1
+    vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
     return vel
 
 #main ==================================================================
@@ -241,6 +245,8 @@ if __name__=="__main__":
             if cv_image is not None:
                 try:
                     ponto_fuga = atividade3_projeto.ponto_fuga(cv_image)
+                    print('ponto fuga')
+                    print(ponto_fuga)
                 except:
                     pass
 
@@ -257,10 +263,15 @@ if __name__=="__main__":
                     if leitura_scan <= d:
                         vel = parar()
                         status_creeper = True
-                        print('press enter to continue')
+                        #print('press enter to continue')
                         #raw_input()
-                    if status_creeper==True:
+                    if status_creeper==True and leitura_scan > 0.7:
                         vel = procurar_pista(v,w)
+                    
+                    if leitura_scan <= 0.7 and status_creeper==True:
+                        vel = dar_re(v)
+
+                    if ponto_fuga[0] != 0 and status_creeper == True:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
                     
                 else:
