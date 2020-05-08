@@ -32,7 +32,7 @@ id = 0
 leitura_scan = 0
 
 w = 0.08
-v = 0.1
+v = 0.2
 
 frame = "camera_link"
 # frame = "head_camera"  # DESCOMENTE para usar com webcam USB via roslaunch tag_tracking usbcam
@@ -158,7 +158,13 @@ mediana_y = 0
 
 id_creeper = 0
 
-def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w, vel):
+
+
+#funções de ações do robô =======================================
+
+
+
+def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w):
     if ponto_fuga + faixa_ponto_fuga < centro_robo:
         print('direita')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
@@ -170,8 +176,10 @@ def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w, vel):
     if abs(ponto_fuga - centro_robo) <= faixa_ponto_fuga:
         print('reto')
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+    
+    return vel
 
-def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w, vel):
+def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w):
     if centro_creeper + faixa_creeper < centro_robo:
         print('procurando')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
@@ -183,6 +191,8 @@ def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w, vel):
     if abs(centro_creeper - centro_robo) <= faixa_creeper:
         print('achei')
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+    
+    return vel
 
 if __name__=="__main__":
 
@@ -222,39 +232,14 @@ if __name__=="__main__":
                     pass
 
                 if len(centro) and len(media) != 0:
-                    print('leitura_scan')
-                    print(leitura_scan)
-
-                    #Codigo para identificar o creeper pela cor
-
-                    #if leitura_scan <= d and leitura_scan != 0:
-                     #   vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                    print('area')
+                    print(area)
                     
-                    #if leitura_scan > d:
-                    
-                    if area >= 3000:
-                        procurando_creeper(media[0], centro[0], faixa_creeper, v, w, vel)
+                    if area >= 1000:
+                        vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
 
                     else:
-                        anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w, vel)
-                        
-
-                        #if area >= 100 and leitura_scan > d:
-                        #	print('achei o id do creeper')
-                        #	if media[0] + faixa_creeper < centro[0]:
-                        #		print('centralizando no creeper')
-                        #		vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
-
-                        #	elif media[0] - faixa_creeper > centro[0]:
-                        #		print('centralizando no creeper')
-                        #		vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
-
-                        #	if abs(media[0] - centro[0]) <= faixa_creeper:
-                        #		print('andando em direção ao creeper')
-                        #		vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
-
-                        #if leitura_scan <= d and leitura_scan != 0:
-                        #	vel = Twist(Vector3(0,0,0), Vector3(0,0,0))
+                        vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
 
                 else:
                     print('parado')
