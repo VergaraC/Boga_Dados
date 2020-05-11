@@ -32,7 +32,7 @@ id = 0
 leitura_scan = 0
 
 w = 0.08
-v = 0.3
+v = 0.1
 
 frame = "camera_link"
 # frame = "head_camera"  # DESCOMENTE para usar com webcam USB via roslaunch tag_tracking usbcam
@@ -145,7 +145,7 @@ faixa_creeper = 20
 
 faixa_ponto_fuga = 20
 
-d = 0.22
+d = 0.3
 
 status_creeper=False
 
@@ -201,7 +201,7 @@ def parar():
 
 def procurar_pista(v,w):
     w = 0.1
-    vel = Twist(Vector3(0.1,0,0), Vector3(0,0,-w))
+    vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
     return vel
 
 def dar_re(v):
@@ -263,8 +263,21 @@ if __name__=="__main__":
                     if leitura_scan <= d:
                         vel = parar()
                         status_creeper = True
+                        #posição inicial da garra para pegar o creeper 
+                        #x: 0.300
+                        #y: 0
+                        #z: 0.304
+                        #Greeper: 0.02
+
+                        #posição depois de pegar o creeper:
+                        #home pose
+                        
+#=======================================================================================================
+                        #DESCOMENTE ESSAS LINHAS ABAIXO PARA VER ERRO DO raw_input
+#=======================================================================================================
                         #print('press enter to continue')
                         #raw_input()
+
                     if status_creeper==True and leitura_scan > 0.7:
                         vel = procurar_pista(v,w)
                     
@@ -286,10 +299,10 @@ if __name__=="__main__":
                 if img_cor is not None:
                     cv2.imshow("DEBUG", img_cor) 
                     cv2.waitKey(1)
-                else: 
+                else:
                     print("cor_debug is null")
 
-                rospy.sleep(0.1)
+                rospy.sleep(0.05)
 
     except rospy.ROSInterruptException:
         print("Ocorreu uma exceção com o rospy")
