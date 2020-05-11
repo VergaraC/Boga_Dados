@@ -145,7 +145,7 @@ faixa_creeper = 20
 
 faixa_ponto_fuga = 20
 
-d = 0.3
+d = 0.22
 
 status_creeper=False
 
@@ -254,7 +254,7 @@ if __name__=="__main__":
                     print('leitura scan')
                     print(leitura_scan)
                     
-                    if area >= 1000 and status_creeper ==False:
+                    if area >= 1500 and status_creeper ==False:
                         vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
 
                     else:
