@@ -92,7 +92,7 @@ def identifica_cor(frame):
     maior_contorno_area = 0
 
     for cnt in contornos:
-        area = cv2.contourArea(cnt)
+        area =abs( cv2.contourArea(cnt))
         if area > maior_contorno_area:
             maior_contorno = cnt
             maior_contorno_area = area

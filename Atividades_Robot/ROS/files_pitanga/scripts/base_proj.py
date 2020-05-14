@@ -49,6 +49,11 @@ media = []
 centro = []
 atraso = 1.5E9 # 1 segundo e meio. Em nanossegundos
 
+centro_estacao = 0
+
+#CLASSES = [ "bicycle", "bird","cat","dog"]
+station_MNet="cat"
+
 area = 0.0 # Variavel com a area do maior contorno
 
 # Só usar se os relógios ROS da Raspberry e do Linux desktop estiverem sincronizados. 
@@ -64,6 +69,7 @@ def roda_todo_frame(imagem):
     global resultados
     global img_cor
     global area
+    global centro_estacao
 
     now = rospy.get_rostime()
     imgtime = imagem.header.stamp
@@ -80,10 +86,12 @@ def roda_todo_frame(imagem):
         # chamada resultados
         # Parte MobileNet  - rede neural
         centro, saida_net, resultados =  visao_module.processa(temp_image)        
-        for r in resultados:
-            # print(r) - print feito para documentar e entender
-            # o resultado
-            pass
+        centro_estacao=0
+        for result in resultados:
+            if result[0] == station_MNet and result[1] >= 50:
+                xi = result[2][0]
+                xf = result[3][0]
+                centro_estacao = (xi+xf)/2
 
         # Parte cor:
 
@@ -137,13 +145,15 @@ def recebe(msg):
         angulo_marcador_robo = math.degrees(math.acos(cosa))
         
         # Terminamos
-        print("id: {} x {} y {} z {} angulo {} ".format(id, x,y,z, angulo_marcador_robo))
+        #print("id: {} x {} y {} z {} angulo {} ".format(id, x,y,z, angulo_marcador_robo))
 
 #====================== tratamento de eventos ============================
 
 faixa_creeper = 20
 
 faixa_ponto_fuga = 20
+
+faixa_estacao = 20
 
 d = 0.22
 
@@ -158,7 +168,6 @@ mediana_x = 0
 mediana_y = 0
 
 id_creeper = 0
-
 
 
 #funções de ações do robô =======================================
@@ -182,15 +191,15 @@ def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w):
 
 def procurando_creeper(centro_creeper, centro_robo, faixa_creeper, v, w):
     if centro_creeper + faixa_creeper < centro_robo:
-        print('procurando')
+        print('procurando creeper')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
     elif centro_creeper - faixa_creeper > centro_robo:
-        print('procurando')
+        print('procurando creeper')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
 
     if abs(centro_creeper - centro_robo) <= faixa_creeper:
-        print('achei')
+        print('achei o creeper')
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
     
     return vel
@@ -207,6 +216,29 @@ def procurar_pista(v,w):
 def dar_re(v):
     v = -0.1
     vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+    return vel
+
+def procura_estacao(centro_estacao, centro_robo, faixa_estacao, leitura_scan, v, w):
+
+    if centro_estacao + faixa_estacao < centro_robo:
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
+        print('procurando estação')
+    
+    elif centro_estacao - faixa_estacao > centro_robo:
+        vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
+        print('procurando estação')
+
+    if abs(centro_estacao - centro_robo) <= faixa_estacao:
+        vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+        print('achei a estação')
+    
+    if leitura_scan <= 0.3:
+        parar()
+        print('parei')
+        print('')
+        print('USE A GARRA')
+        raw_input()
+    
     return vel
 
 #main ==================================================================
@@ -253,16 +285,26 @@ if __name__=="__main__":
                 if len(centro) and len(media) != 0:
                     print('leitura scan')
                     print(leitura_scan)
-                    
-                    if area >= 1500 and status_creeper ==False:
+                
+                    print("Area:",area)
+                    if area >= 1500 and status_creeper == False:
                         vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
+                        if leitura_scan <= d:
+                            vel = parar()
+                            status_creeper = True
+                            print('USE A GARRA')
+                            raw_input()
+
+                    elif status_creeper == True and centro_estacao!=0:
+                        procura_estacao(centro_estacao, centro[0], faixa_estacao, leitura_scan, v, w)
+                        
+                    elif status_creeper==True:
+                        vel = procurar_pista(v,w)
 
                     else:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
                     
-                    if leitura_scan <= d:
-                        vel = parar()
-                        status_creeper = True
+                    
                         #posição inicial da garra para pegar o creeper 
                         #x: 0.300
                         #y: 0
@@ -275,14 +317,11 @@ if __name__=="__main__":
 #=======================================================================================================
                         #DESCOMENTE ESSAS LINHAS ABAIXO PARA VER ERRO DO raw_input
 #=======================================================================================================
-                        #print('press enter to continue')
-                        #raw_input()
 
-                    if status_creeper==True and leitura_scan > 0.7:
-                        vel = procurar_pista(v,w)
                     
-                    if leitura_scan <= 0.7 and status_creeper==True:
-                        vel = dar_re(v)
+                    
+                    #if leitura_scan <= 0.7 and status_creeper==True:
+                    #    vel = dar_re(v)
 
                     if ponto_fuga[0] != 0 and status_creeper == True:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
