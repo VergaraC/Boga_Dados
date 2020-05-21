@@ -155,7 +155,7 @@ faixa_ponto_fuga = 20
 
 faixa_estacao = 20
 
-d = 0.22
+d = 0.3
 
 status_creeper=False
 
@@ -220,15 +220,15 @@ def dar_re(v):
 
 def procura_estacao(centro_estacao, centro_robo, faixa_estacao, leitura_scan, v, w):
 
-    if centro_estacao + faixa_estacao < centro_robo:
+    if centro_estacao + faixa_estacao < centro_robo and leitura_scan > 0.3:
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
         print('procurando estação')
     
-    elif centro_estacao - faixa_estacao > centro_robo:
+    elif centro_estacao - faixa_estacao > centro_robo and leitura_scan > 0.3:
         vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
         print('procurando estação')
 
-    if abs(centro_estacao - centro_robo) <= faixa_estacao:
+    if abs(centro_estacao - centro_robo) <= faixa_estacao and leitura_scan > 0.3:
         vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
         print('achei a estação')
     
@@ -236,7 +236,7 @@ def procura_estacao(centro_estacao, centro_robo, faixa_estacao, leitura_scan, v,
         parar()
         print('parei')
         print('')
-        print('USE A GARRA')
+        print('SOLTE O CREEPER')
         raw_input()
     
     return vel
@@ -287,13 +287,22 @@ if __name__=="__main__":
                     print(leitura_scan)
                 
                     print("Area:",area)
-                    if area >= 1500 and status_creeper == False:
+                    if area >= 3000 and status_creeper == False:
                         vel = procurando_creeper(media[0], centro[0], faixa_creeper, v, w)
                         if leitura_scan <= d:
                             vel = parar()
                             status_creeper = True
                             print('USE A GARRA')
                             raw_input()
+
+                            #posição inicial da garra para pegar o creeper 
+                            #x: 0.300
+                            #y: 0
+                            #z: 0.304
+                            #Greeper: 0.02
+
+                            #posição depois de pegar o creeper:
+                            #setar home pose
 
                     elif status_creeper == True and centro_estacao!=0:
                         procura_estacao(centro_estacao, centro[0], faixa_estacao, leitura_scan, v, w)
@@ -304,24 +313,8 @@ if __name__=="__main__":
                     else:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
                     
-                    
-                        #posição inicial da garra para pegar o creeper 
-                        #x: 0.300
-                        #y: 0
-                        #z: 0.304
-                        #Greeper: 0.02
-
-                        #posição depois de pegar o creeper:
-                        #home pose
-                        
-#=======================================================================================================
-                        #DESCOMENTE ESSAS LINHAS ABAIXO PARA VER ERRO DO raw_input
-#=======================================================================================================
-
-                    
-                    
-                    #if leitura_scan <= 0.7 and status_creeper==True:
-                    #    vel = dar_re(v)
+                    if leitura_scan <= 0.7 and status_creeper==True:
+                        vel = dar_re(v)
 
                     if ponto_fuga[0] != 0 and status_creeper == True:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
