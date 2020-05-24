@@ -51,8 +51,14 @@ atraso = 1.5E9 # 1 segundo e meio. Em nanossegundos
 
 centro_estacao = 0
 
-#CLASSES = [ "bicycle", "bird","cat","dog"]
-station="cat"
+#("blue", 11, "cat") ("green", 21, "dog") ("pink", 12, "bike")
+#Fazendo para Conceito B, assim não utilizamos o id
+
+goal = ("blue", 11, "cat")
+
+station = goal[2]
+
+cor = goal[0]
 
 area = 0.0 # Variavel com a area do maior contorno
 
@@ -70,6 +76,12 @@ def roda_todo_frame(imagem):
     global img_cor
     global area
     global centro_estacao
+    global cor
+    global goal
+    global station
+
+    cor = goal[0]
+    station = goal[2]
 
     now = rospy.get_rostime()
     imgtime = imagem.header.stamp
@@ -95,7 +107,7 @@ def roda_todo_frame(imagem):
 
         # Parte cor:
 
-        media, centro, img_cor, area = visao_module.identifica_cor(temp_image) 
+        media, centro, img_cor, area = visao_module.identifica_cor(temp_image, cor) 
         
 
         depois = time.clock()
@@ -157,7 +169,8 @@ faixa_estacao = 30
 
 procurar_estacao = False
 
-d = 0.18
+
+d = 0.21
 
 status_creeper=False
 
@@ -182,11 +195,11 @@ def comeca(v,w):
 
 def anda_pista(centro_robo, ponto_fuga, faixa_ponto_fuga,v,w):
     if ponto_fuga + faixa_ponto_fuga < centro_robo:
-        print('direita')
+        print('esquerda')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
 
     elif ponto_fuga - faixa_ponto_fuga > centro_robo:
-        print('esquerda')
+        print('direita')
         vel = Twist(Vector3(0,0,0), Vector3(0,0,-w))
     
     if abs(ponto_fuga - centro_robo) <= faixa_ponto_fuga:
@@ -226,12 +239,15 @@ def procurar_pista(v,w):
     vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
     return vel
 
-def dar_re(v):
+def dar_re(v,w):
     v = -0.2
-    vel = Twist(Vector3(v,0,0), Vector3(0,0,0))
+    w = 0.05
+    vel = Twist(Vector3(v,0,0), Vector3(0,0,w))
     return vel
 
 def procura_estacao(centro_estacao, centro_robo, faixa_estacao, v, w, leitura_scan):
+    v = 0.1
+    w = 0.08
 
     if centro_estacao + faixa_estacao < centro_robo:
         vel = Twist(Vector3(0,0,0), Vector3(0,0,w))
@@ -292,14 +308,14 @@ if __name__=="__main__":
                     vel = comeca(0.12,0.03)
                     velocidade_saida.publish(vel)
                     status_comeca = False
-                    rospy.sleep(8)
+                    rospy.sleep(9)
 
                 if len(centro) and len(media) != 0:
                     print('leitura scan')
                     print(leitura_scan)
                 
                     print("Area:",area)
-                    if area > 6500:
+                    if area > 7000:
                         status_area = True
 
                     if status_area == True and status_creeper == False:
@@ -338,14 +354,14 @@ if __name__=="__main__":
                             print('SOLTE O CREEPER')
                             raw_input()
                         
-                    elif status_creeper == True and procurar_estacao == False:
-                        vel = procurar_pista(v,w)
+                    #elif status_creeper == True and procurar_estacao == False and status_re == False:
+                    #    vel = procurar_pista(v,w)
 
                     else:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)
                     
-                    #$if leitura_scan <= 2 and status_creeper == True and centro_estacao == 0:
-                    #     vel = dar_re(v)
+                    if status_creeper == True and ponto_fuga[0] == 0 and centro_estacao == 0:
+                        vel = dar_re(v,w)
 
                     if ponto_fuga[0] != 0 and status_creeper == True and procurar_estacao == False:
                         vel = anda_pista(centro[0], ponto_fuga[0], faixa_ponto_fuga, v, w)

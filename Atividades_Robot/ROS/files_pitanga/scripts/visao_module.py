@@ -17,7 +17,6 @@ from cv_bridge import CvBridge, CvBridgeError
 import mobilenet_simples as mnet
 
 
-
 def processa(frame):
     '''Use esta funcao para basear o processamento do seu robo'''
 
@@ -36,11 +35,10 @@ def processa(frame):
     return centro, result_frame, result_tuples
 
 
-
-def identifica_cor(frame):
-    '''
-    Segmenta o maior objeto cuja cor é parecida com cor_h (HUE da cor, no espaço HSV).
-    '''
+def identifica_cor(frame, cor):
+    
+    #Segmenta o maior objeto cuja cor é parecida com cor_h (HUE da cor, no espaço HSV).
+    
 
     # No OpenCV, o canal H vai de 0 até 179, logo cores similares ao
     # vermelho puro (H=0) estão entre H=-8 e H=8.
@@ -48,24 +46,23 @@ def identifica_cor(frame):
     # do vermelho:
     frame_hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    ############# Azul ################
-    cor_menor = np.array([89, 90, 90])
-    cor_maior = np.array([119, 255, 255])
-    segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
+    if cor == "blue":
+        # Azul 
+        cor_menor = np.array([89, 90, 90])
+        cor_maior = np.array([119, 255, 255])
 
-    ############# Roxo ################
-    '''
-    cor_menor = np.array([135, 90, 90])
-    cor_maior = np.array([165, 255, 255])
-    segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
-    '''
-    ############# Verde ################
-    '''
-    cor_menor = np.array([47, 90, 90])
-    cor_maior = np.array([77, 255, 255])
-    segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
-    '''
+    elif cor == "pink": 
+        # Roxo
+        cor_menor = np.array([135, 90, 90])
+        cor_maior = np.array([165, 255, 255])
 
+    elif cor == "green":  
+        #Verde 
+        cor_menor = np.array([47, 90, 90])
+        cor_maior = np.array([77, 255, 255])
+
+    segmentado_cor = cv2.inRange(frame_hsv, cor_menor, cor_maior)
+    
     # Note que a notacão do numpy encara as imagens como matriz, portanto o enderecamento é
     # linha, coluna ou (y,x)
     # Por isso na hora de montar a tupla com o centro precisamos inverter, porque
